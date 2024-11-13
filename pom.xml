@@ -20,5 +20,10 @@
             <artifactId>MathParser.org-mXparser</artifactId>
             <version>6.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+        </dependency>
     </dependencies>
 </project>

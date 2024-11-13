@@ -1,10 +1,7 @@
-package tms.web_calcs;
+package tms.web_calcs.handlers;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import tms.web_calcs.enums.RequetMethod;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,6 +12,10 @@ import java.util.Map;
 // localhost:8080/greeting?name=Test&age=22 -> Hello Test
 
 public class GreetingHandler extends BaseHandler {
+
+    public GreetingHandler() {
+        super(RequetMethod.GET);
+    }
 
     @Override
     public String getResponse(Map<String, String> parameters) {

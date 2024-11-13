@@ -1,5 +1,9 @@
 package tms.web_calcs;
 
+import com.google.gson.Gson;
+import tms.web_calcs.enums.TemperatureUnitMeasure;
+import tms.web_calcs.models.ConvertRequest;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,27 +19,47 @@ import java.util.Scanner;
 
 public class Client {
 
-    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your expression(f.e 20+30+50): ");
-        String expression = scanner.next();
+    private static Scanner input(String message){
+        System.out.println(message);
+        return new Scanner(System.in);
+    }
 
-        HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://localhost:8080/calc?expression=%s".formatted(expression))).GET().build();
+
+    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
+        temperatureRequest();
+        //calcRequest();
+    }
+
+    private static void temperatureRequest() throws IOException, InterruptedException, URISyntaxException {
+        Double value = input("Enter value: ").nextDouble();
+        char from = input("Enter current temperature measure (K,C,F): ").next().charAt(0);
+        char to = input("Enter target temperature measure (K,C,F): ").next().charAt(0);
+        Gson gson = new Gson();
+        ConvertRequest model = new ConvertRequest(value,
+                TemperatureUnitMeasure.getTemperatureUnitMeasure(from),
+                TemperatureUnitMeasure.getTemperatureUnitMeasure(to));
+
+        String json  = gson.toJson(model);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://localhost:8080/convert"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
+
         HttpClient client = HttpClient.newBuilder().build();
         HttpResponse<String> send = client.send(request, HttpResponse.BodyHandlers.ofString());
         String result = send.body();
         System.out.println(result);
-//        System.out.println("Enter your name: ");
-//        String name = scanner.next();
-//        System.out.println("Enter your age: ");
-//        int age = scanner.nextInt();
-//
-//
-//        HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://localhost:8080/greeting?name=%s&age=%s".formatted(name, age))).GET().build();
-//
-//        HttpClient client = HttpClient.newBuilder().build();
-//        HttpResponse<String> send = client.send(request, HttpResponse.BodyHandlers.ofString());
-//        String result = send.body();
-//        System.out.println(result);
+    }
+
+    private static void calcRequest() throws URISyntaxException, IOException, InterruptedException {
+        String expression = input("Enter your expression(f.e 20+30+50): ").next();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/calc?expression=%s".formatted(expression))).GET().build();
+
+        HttpClient client = HttpClient.newBuilder().build();
+        HttpResponse<String> send = client.send(request, HttpResponse.BodyHandlers.ofString());
+        String result = send.body();
+        System.out.println(result);
     }
 }
